@@ -16,6 +16,17 @@ class AuthController extends Controller
     public function actionIndex()
     {
         echo 'Test action';
+        $user = User::findByEmail(Yii::$app->request->post("email"));
+        $password = Yii::$app->request->post("password");
+
+        if ($user != NULL && Yii::$app->security->validatePassword($password, $user->password)) {
+            $tokenQuery = Token::findOne(['userId' => $user->userId]);
+            $accessToken = $tokenQuery->accessToken;
+            return  $accessToken;
+        } else {
+            return 'Email или password введён неправильно.';
+        }
+        die; var_dump($user);
     }
     public function actionLogin()
     {
@@ -27,6 +38,7 @@ class AuthController extends Controller
         $newUser->email = Yii::$app->request->post("email");
         $newUser->username = Yii::$app->request->post("username");
         $newUser->password = Yii::$app->getSecurity()->generatePasswordHash(Yii::$app->request->post("password"));
+        
         if (User::findByEmail($newUser->email)) {
             return 'Пользователь с таким e-mail уже имеется.';
         } else {
