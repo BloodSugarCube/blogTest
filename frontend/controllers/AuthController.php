@@ -16,6 +16,9 @@ class AuthController extends Controller
     public function actionIndex()
     {
         echo 'Test action';
+    }
+    public function actionLogin()
+    {
         $user = User::findByEmail(Yii::$app->request->post("email"));
         $password = Yii::$app->request->post("password");
 
@@ -26,10 +29,6 @@ class AuthController extends Controller
         } else {
             return 'Email или password введён неправильно.';
         }
-        die; var_dump($user);
-    }
-    public function actionLogin()
-    {
     }
     public function actionSignUp()
     {
