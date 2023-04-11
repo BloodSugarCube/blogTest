@@ -3,7 +3,6 @@
 namespace common\models;
 
 use Yii;
-
 /**
  * This is the model class for table "Article".
  *
@@ -26,9 +25,11 @@ class Article extends BaseArticle
     {
         $serializedData = [];
         $serializedData['articleId'] = $this->articleId;
-        $serializedData['userId'] = $this->userId;
         $serializedData['text'] = $this->text;
-        
+
+        if (!empty($this->userId)) {
+            $serializedData['user'] = $this->user->serializedData();
+        }
         return $serializedData;
 	}
     //Custom relations methods

@@ -21,9 +21,18 @@ class User extends BaseUser implements IdentityInterface
     public function rules()
     {
         return array_merge(parent::rules(), [
-            //Custom rules
+            [['email'], 'email']
         ]);
     }
+
+    public function serializedData()
+    {
+        $serializedData = [];
+        $serializedData['userId'] = $this->userId;
+        $serializedData['username'] = $this->username;
+
+        return $serializedData;
+	}
 
     public static function findIdentity($id)
     {

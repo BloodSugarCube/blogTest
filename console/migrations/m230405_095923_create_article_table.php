@@ -37,12 +37,6 @@ class m230405_095923_create_article_table extends Migration
      */
     public function safeDown()
     {
-        // drops foreign key for table `{{%user}}`
-        $this->dropForeignKey(
-            '{{%fk-article-userId}}',
-            '{{%article}}'
-        );
-
         $this->dropTable('{{%article}}');
     }
 }

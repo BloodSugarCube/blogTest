@@ -22,6 +22,15 @@ class Token extends BaseToken
         ]);
     }
 
+    public static function generateNewToken($userId)
+    {
+        $newToken = new Token();
+        $newToken->userId = $userId;
+        $newToken->accessToken = Yii::$app->security->generateRandomString();
+        $newToken->save();
+        return $newToken->accessToken;
+    }
+
     //Custom relations methods
 
     //Another custom methods

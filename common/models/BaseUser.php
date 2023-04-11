@@ -5,13 +5,16 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "User".
+ * This is the model class for table "user".
  *
  * @property int $userId
  * @property string $email
  * @property string $password
  * @property string $username
  * @property int|null $isAdmin
+ *
+ * @property Article[] $articles
+ * @property Token[] $tokens
  */
 class BaseUser extends \yii\db\ActiveRecord
 {
@@ -20,7 +23,7 @@ class BaseUser extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'User';
+        return 'user';
     }
 
     /**
@@ -48,5 +51,34 @@ class BaseUser extends \yii\db\ActiveRecord
             'username' => 'Username',
             'isAdmin' => 'Is Admin',
         ];
+    }
+
+    /**
+     * Gets query for [[Articles]].
+     *
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
+     */
+    public function getArticles()
+    {
+        return $this->hasMany(Article::class, ['userId' => 'userId']);
+    }
+
+    /**
+     * Gets query for [[Tokens]].
+     *
+     * @return \yii\db\ActiveQuery|yii\db\ActiveQuery
+     */
+    public function getTokens()
+    {
+        return $this->hasMany(Token::class, ['userId' => 'userId']);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return UserQuery the active query used by this AR class.
+     */
+    public static function find()
+    {
+        return new UserQuery(get_called_class());
     }
 }

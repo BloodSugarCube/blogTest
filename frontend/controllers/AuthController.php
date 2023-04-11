@@ -13,40 +13,56 @@ use yii\web\Response;
 class AuthController extends Controller
 {
     public $enableCsrfValidation = false;
-    public function actionIndex()
-    {
-        echo 'Test action';
-    }
+
     public function actionLogin()
     {
-        $user = User::findByEmail(Yii::$app->request->post("email"));
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $email = Yii::$app->request->post("email");
         $password = Yii::$app->request->post("password");
 
-        if ($user != NULL && Yii::$app->security->validatePassword($password, $user->password)) {
-            $tokenQuery = Token::findOne(['userId' => $user->userId]);
-            $accessToken = $tokenQuery->accessToken;
-            return  $accessToken;
-        } else {
-            return 'Email или password введён неправильно.';
+        $user = User::findByEmail($email);
+
+        if (empty($user)) {
+            return 'E-mail введён неправильно.';
         }
+        if (!Yii::$app->security->validatePassword($password, $user->password)) {
+            return 'Password введён неправильно.';
+        }
+
+        $accessToken = Token::generateNewToken($user->userId);
+
+        return [
+            "accessToken" => $accessToken,
+        ];
     }
+
     public function actionSignUp()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $email = Yii::$app->request->post("email");
+        $username = Yii::$app->request->post("username");
+        $password = Yii::$app->request->post("password");
+        $passwordHash = Yii::$app->getSecurity()->generatePasswordHash($password);
+        
         $newUser = new User();
-        $newUser->email = Yii::$app->request->post("email");
-        $newUser->username = Yii::$app->request->post("username");
-        $newUser->password = Yii::$app->getSecurity()->generatePasswordHash(Yii::$app->request->post("password"));
+        $newUser->email = $email;
+        $newUser->username = $username;
+        $newUser->password = $passwordHash;
         
         if (User::findByEmail($newUser->email)) {
             return 'Пользователь с таким e-mail уже имеется.';
-        } else {
-            $newUser->save();
-            $newToken = new Token();
-            $newToken->userId = User::findByEmail($newUser->email)->userId;
-            $newToken->accessToken = Yii::$app->security->generateRandomString();
-            $newToken->save();
-            return $newToken->accessToken;
         }
+
+        if (!$newUser->save()){
+            return 'Регистрация не удалась.';
+        }
+        
+        $accessToken = Token::generateNewToken($newUser->userId);
+
+        return [
+            "accessToken" => $accessToken,
+        ];
     }
 }

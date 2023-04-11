@@ -37,12 +37,6 @@ class m230405_095724_create_token_table extends Migration
      */
     public function safeDown()
     {
-        // drops foreign key for table `{{%user}}`
-        $this->dropForeignKey(
-            '{{%fk-token-userId}}',
-            '{{%token}}'
-        );
-
         $this->dropTable('{{%token}}');
     }
 }
