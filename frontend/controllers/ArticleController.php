@@ -40,14 +40,12 @@ class ArticleController extends Controller
             return 'Не удалось сохранить статью' . var_export($article->getErrors(), true);
         };
 
-        $article->serializeToArray();
-
         return [
-            "articles" => $article,
+            "article" => $article->serializeToArray(),
         ];
     }
 
-    public function actionGetArticles()
+    public function actionArticles()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
@@ -69,7 +67,7 @@ class ArticleController extends Controller
         ];
     }
 
-    public function actionGetUserArticles()
+    public function actionUserArticles()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
@@ -89,7 +87,7 @@ class ArticleController extends Controller
         }
 
         return [
-            "userArticles" => $result,
+            "articles" => $result,
         ];
     }
 }
