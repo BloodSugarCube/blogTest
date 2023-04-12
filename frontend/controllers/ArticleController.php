@@ -17,25 +17,34 @@ class ArticleController extends Controller
     public function actionCreate()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        
+
         $accessToken = Yii::$app->request->post("accessToken");
         $text = Yii::$app->request->post("text");
 
-        $token = Token::find()->where(['accessToken' => $accessToken])->one();
+        $token = Token::find()
+            ->where(['accessToken' => $accessToken])
+            ->one();
 
         if (empty($token)) {
-            return 'incorrect accessToken';
+            return 'Необходимо указать accessToken';
         }
-        if (empty($text)){
-            return 'incorrect text';
+        if (empty($text)) {
+            return 'Необходимо указать text';
         }
-        
-        $newArticle = new Article;
-        $newArticle->userId = $token->userId;
-        $newArticle->text = $text;
-        $newArticle->save();
-        
-        return $newArticle;
+
+        $article = new Article;
+        $article->userId = $token->userId;
+        $article->text = $text;
+
+        if (!$article->save()) {
+            return 'Не удалось сохранить статью' . var_export($article->getErrors(), true);
+        };
+
+        $article->serializeToArray();
+
+        return [
+            "articles" => $article,
+        ];
     }
 
     public function actionGetArticles()
@@ -48,13 +57,13 @@ class ArticleController extends Controller
         $articleQuery = Article::find()
             ->limit($limit)
             ->offset($offset)
-            ->orderBy(['articleId'=>SORT_DESC]);
-            
+            ->orderBy(['articleId' => SORT_DESC]);
+
         $result = [];
-        foreach ($articleQuery->each() as $article){
+        foreach ($articleQuery->each() as $article) {
             $result[] = $article->serializeToArray();
         }
-        
+
         return [
             "articles" => $result,
         ];
@@ -63,7 +72,7 @@ class ArticleController extends Controller
     public function actionGetUserArticles()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        
+
         $limit = Yii::$app->request->get("limit", 10);
         $offset = Yii::$app->request->get("offset", 0);
         $userId = Yii::$app->request->get("userId", 0);
@@ -71,14 +80,14 @@ class ArticleController extends Controller
         $articleQuery = Article::find()
             ->limit($limit)
             ->offset($offset)
-            ->where(['userid' => $userId])
-            ->orderBy(['articleId'=>SORT_DESC]);
-            
+            ->andWhere(['userid' => $userId])
+            ->orderBy(['articleId' => SORT_DESC]);
+
         $result = [];
-        foreach ($articleQuery->each() as $article){
+        foreach ($articleQuery->each() as $article) {
             $result[] = $article->serializeToArray();
         }
-        
+
         return [
             "userArticles" => $result,
         ];

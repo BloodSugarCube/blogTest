@@ -30,10 +30,14 @@ class AuthController extends Controller
             return 'Password введён неправильно.';
         }
 
-        $accessToken = Token::generateNewToken($user->userId);
+        $token = Token::generateNewToken($user->userId);
+
+        if (empty($token)) {
+            return 'Не удалось сгенерировать ключ доступа.';
+        }
 
         return [
-            "accessToken" => $accessToken,
+            "accessToken" => $token->accessToken,
         ];
     }
 
@@ -45,24 +49,24 @@ class AuthController extends Controller
         $username = Yii::$app->request->post("username");
         $password = Yii::$app->request->post("password");
         $passwordHash = Yii::$app->getSecurity()->generatePasswordHash($password);
-        
+
         $newUser = new User();
         $newUser->email = $email;
         $newUser->username = $username;
         $newUser->password = $passwordHash;
-        
-        if (User::findByEmail($newUser->email)) {
-            return 'Пользователь с таким e-mail уже имеется.';
+
+        if (!$newUser->save()) {
+            return 'Регистрация не удалась.' . var_export($newUser->getErrors(), true);
         }
 
-        if (!$newUser->save()){
-            return 'Регистрация не удалась.';
+        $token = Token::generateNewToken($newUser->userId);
+
+        if (empty($token)) {
+            return 'Не удалось сгенерировать ключ доступа.';
         }
-        
-        $accessToken = Token::generateNewToken($newUser->userId);
 
         return [
-            "accessToken" => $accessToken,
+            "accessToken" => $token->accessToken,
         ];
     }
 }
