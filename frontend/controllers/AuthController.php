@@ -13,6 +13,7 @@ class AuthController extends Controller
 
     public function actionLogin()
     {
+        //Todo: beforeAction
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = new LoginForm();
         $model->load(\Yii::$app->request->post(), '');

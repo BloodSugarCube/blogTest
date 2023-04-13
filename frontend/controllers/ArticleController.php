@@ -13,6 +13,7 @@ class ArticleController extends Controller
 
     public function actionCreate()
     {
+        //Todo: beforeAction
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = new CreateArticleForm();
         $model->load(\Yii::$app->request->post(), '');

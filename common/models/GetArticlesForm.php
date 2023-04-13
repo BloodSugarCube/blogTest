@@ -27,6 +27,7 @@ class GetArticlesForm extends Model
         ];
     }
 
+    //Todo: getByLimitOffsetId() => findArticles
     public function getByLimitOffsetId()
     {
         if (!$this->validate()) {
@@ -35,19 +36,14 @@ class GetArticlesForm extends Model
         }
 
         $articleQuery = Article::find()
-            ->limit($this->limit)
-            ->offset($this->offset)
             ->andFilterWhere(['userId' => $this->userId])
-            ->orderBy(['articleId' => SORT_DESC]);
+            ->orderBy(['articleId' => SORT_DESC])
+            ->limit($this->limit)
+            ->offset($this->offset);
 
         $articles = [];
         foreach ($articleQuery->each() as $article) {
             $articles[] = $article->serializeToArray();
-        }
-
-        if (empty($articles)) {
-            $this->addError('articles', 'С такими значениями limit, offset и id статей не найдено.');
-            return false;
         }
 
         $this->articles = $articles;
@@ -57,6 +53,7 @@ class GetArticlesForm extends Model
 
     public function getArticles()
     {
+        //Todo: foreach trans
         return ["articles" => $this->articles];
     }
 }

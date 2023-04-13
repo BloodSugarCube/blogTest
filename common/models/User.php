@@ -73,6 +73,11 @@ class User extends BaseUser implements IdentityInterface
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
+    public static function userList(){
+        return static::find()
+            ->select(['userId', 'username'])
+            ->all();
+    }
     
     //Custom relations methods
 

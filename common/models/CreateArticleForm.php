@@ -49,6 +49,7 @@ class CreateArticleForm extends Model
         }
 
         $article = new Article;
+        //Todo: load in model Article
         $article->userId = $token->userId;
         $article->text = $this->text;
 
@@ -57,13 +58,11 @@ class CreateArticleForm extends Model
             return false;
         };
 
-        $this->article = $article->serializeToArray();
-
         return true;
     }
 
     public function getArticle()
     {
-        return ["article" => $this->article];
+        return ["article" => $this->article->serializeToArray()];
     }
 }
