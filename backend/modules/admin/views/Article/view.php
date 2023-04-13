@@ -2,11 +2,12 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use common\models\Article;
 
 /** @var yii\web\View $this */
 /** @var common\models\Article $model */
 
-$this->title = $model->articleId;
+$this->title = 'Article №'.$model->articleId;
 $this->params['breadcrumbs'][] = ['label' => 'Articles', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -30,7 +31,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'articleId',
-            'userId',
+            [
+                'attribute' => 'User',
+                'format' => 'html',
+                'value' => function (Article $model) {
+                    return (!empty($model->user)) ? Html::a($model->user->username, ['user/view', 'userId' => $model->userId]) : null;
+                },
+            ],
             'text:ntext',
         ],
     ]) ?>

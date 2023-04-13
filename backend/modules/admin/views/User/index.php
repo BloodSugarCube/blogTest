@@ -27,9 +27,14 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
 
-            'userId',
+            [
+                'attribute' => 'userId',
+                'format' => 'html',
+                'value' => function (User $model) {
+                    return Html::a($model->primaryKey, ['view', 'userId' => $model->primaryKey]);
+                },
+            ],
             'email:email',
             'password',
             'username',

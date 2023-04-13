@@ -27,10 +27,20 @@ $this->params['breadcrumbs'][] = $this->title;
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'articleId',
-            'userId',
+            [
+                'attribute' => 'articleId',
+                'format' => 'html',
+                'value' => function (Article $model) {
+                    return Html::a($model->primaryKey, ['view', 'articleId' => $model->primaryKey]);
+                },
+            ],
+            [
+                'attribute' => 'User',
+                'format' => 'html',
+                'value' => function (Article $model) {
+                    return (!empty($model->user)) ? Html::a($model->user->username, ['user/view', 'userId' => $model->userId]) : null;
+                },
+            ],
             'text:ntext',
             [
                 'class' => ActionColumn::className(),
