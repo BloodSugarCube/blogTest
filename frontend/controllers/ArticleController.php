@@ -2,13 +2,10 @@
 
 namespace frontend\controllers;
 
-use common\models\Article;
-use common\models\Token;
+use common\models\CreateArticleForm;
+use common\models\GetArticlesForm;
 use Yii;
 use yii\web\Controller;
-use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use yii\web\Response;
 
 class ArticleController extends Controller
 {
@@ -17,77 +14,26 @@ class ArticleController extends Controller
     public function actionCreate()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        $accessToken = Yii::$app->request->post("accessToken");
-        $text = Yii::$app->request->post("text");
-
-        $token = Token::find()
-            ->where(['accessToken' => $accessToken])
-            ->one();
-
-        if (empty($token)) {
-            return 'Необходимо указать accessToken';
+        $model = new CreateArticleForm();
+        $model->load(\Yii::$app->request->post(), '');
+        if ($model->createArticle()) {
+            return $model->getArticle();
+        } else {
+            $errors = $model->getErrors();
+            return $errors;
         }
-        if (empty($text)) {
-            return 'Необходимо указать text';
-        }
-
-        $article = new Article;
-        $article->userId = $token->userId;
-        $article->text = $text;
-
-        if (!$article->save()) {
-            return 'Не удалось сохранить статью' . var_export($article->getErrors(), true);
-        };
-
-        return [
-            "article" => $article->serializeToArray(),
-        ];
     }
 
     public function actionArticles()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        $limit = Yii::$app->request->get("limit", 10);
-        $offset = Yii::$app->request->get("offset", 0);
-
-        $articleQuery = Article::find()
-            ->limit($limit)
-            ->offset($offset)
-            ->orderBy(['articleId' => SORT_DESC]);
-
-        $result = [];
-        foreach ($articleQuery->each() as $article) {
-            $result[] = $article->serializeToArray();
+        $model = new GetArticlesForm();
+        $model->load(\Yii::$app->request->get(), '');
+        if ($model->getByLimitOffsetId()) {
+            return $model->getArticles();
+        } else {
+            $errors = $model->getErrors();
+            return $errors;
         }
-
-        return [
-            "articles" => $result,
-        ];
-    }
-
-    public function actionUserArticles()
-    {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        $limit = Yii::$app->request->get("limit", 10);
-        $offset = Yii::$app->request->get("offset", 0);
-        $userId = Yii::$app->request->get("userId", 0);
-
-        $articleQuery = Article::find()
-            ->limit($limit)
-            ->offset($offset)
-            ->andWhere(['userid' => $userId])
-            ->orderBy(['articleId' => SORT_DESC]);
-
-        $result = [];
-        foreach ($articleQuery->each() as $article) {
-            $result[] = $article->serializeToArray();
-        }
-
-        return [
-            "articles" => $result,
-        ];
     }
 }
