@@ -15,7 +15,7 @@ class GetArticlesForm extends Model
     public $limit;
     public $offset;
     public $userId;
-    private $articles;
+    private $articleQuery;
 
 
     public function rules()
@@ -27,8 +27,7 @@ class GetArticlesForm extends Model
         ];
     }
 
-    //Todo: getByLimitOffsetId() => findArticles
-    public function getByLimitOffsetId()
+    public function findArticles()
     {
         if (!$this->validate()) {
             $this->addError('validate', 'Данные введены не соответственно своему типу.');
@@ -39,21 +38,19 @@ class GetArticlesForm extends Model
             ->andFilterWhere(['userId' => $this->userId])
             ->orderBy(['articleId' => SORT_DESC])
             ->limit($this->limit)
-            ->offset($this->offset);
-
-        $articles = [];
-        foreach ($articleQuery->each() as $article) {
-            $articles[] = $article->serializeToArray();
-        }
-
-        $this->articles = $articles;
+            ->offset($this->offset);;
+        $this->articleQuery = $articleQuery;
 
         return true;
     }
 
     public function getArticles()
     {
-        //Todo: foreach trans
-        return ["articles" => $this->articles];
+        $articles = [];
+        foreach ($this->articleQuery->each() as $article) {
+            $articles[] = $article->serializeToArray();
+        }
+
+        return ["articles" => $articles];
     }
 }

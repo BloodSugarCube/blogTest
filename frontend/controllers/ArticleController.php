@@ -11,10 +11,13 @@ class ArticleController extends Controller
 {
     public $enableCsrfValidation = false;
 
+    public function beforeAction($action)
+    {
+        return \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    }
+
     public function actionCreate()
     {
-        //Todo: beforeAction
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = new CreateArticleForm();
         $model->load(\Yii::$app->request->post(), '');
         if ($model->createArticle()) {
@@ -27,10 +30,9 @@ class ArticleController extends Controller
 
     public function actionArticles()
     {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = new GetArticlesForm();
         $model->load(\Yii::$app->request->get(), '');
-        if ($model->getByLimitOffsetId()) {
+        if ($model->findArticles()) {
             return $model->getArticles();
         } else {
             $errors = $model->getErrors();

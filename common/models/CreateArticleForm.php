@@ -48,15 +48,16 @@ class CreateArticleForm extends Model
             return false;
         }
 
-        $article = new Article;
-        //Todo: load in model Article
+        $article = new Article();
+        $article->load(Yii::$app->request->post(), '');
         $article->userId = $token->userId;
-        $article->text = $this->text;
 
         if (!$article->save()) {
             $this->addError('article', 'Не удалось сохранить статью');
             return false;
-        };
+        }
+
+        $this->article = $article;
 
         return true;
     }

@@ -11,10 +11,13 @@ class AuthController extends Controller
 {
     public $enableCsrfValidation = false;
 
+    public function beforeAction($action)
+    {
+        return \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    }
+
     public function actionLogin()
     {
-        //Todo: beforeAction
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = new LoginForm();
         $model->load(\Yii::$app->request->post(), '');
         if ($model->loginByEmail()) {
@@ -28,7 +31,6 @@ class AuthController extends Controller
     public
     function actionSignup()
     {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = new SignupForm();
         $model->load(\Yii::$app->request->post(), '');
         if ($model->signUp()) {
